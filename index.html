@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Peminjaman Ruangan - ITSB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #3d5a80;
+            --primary-light: #5a7fa1;
+            --secondary: #4a9d9f;
+            --accent: #d4a574;
+            --destructive: #dc2626;
+            --background: #f8fafc;
+            --card: #ffffff;
+            --foreground: #172554;
+            --muted-foreground: #64748b;
+            --border: #e2e8f0;
+            --success: #16a34a;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background-color: var(--background);
+            color: var(--foreground);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Header */
+        .header {
+            border-bottom: 1px solid var(--border);
+            background-color: var(--card);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 0;
+        }
+
+        .header-left h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header-left p {
+            font-size: 14px;
+            color: var(--muted-foreground);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info p:first-child {
+            font-size: 12px;
+            color: var(--muted-foreground);
+        }
+
+        .user-info p:last-child {
+            font-weight: 600;
+            margin-top: 4px;
+        }
+
+        /* Button Styles */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+            background-color: var(--primary-light);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-accent {
+            background-color: var(--accent);
+            color: var(--foreground);
+        }
+
+        .btn-accent:hover {
+            opacity: 0.9;
+        }
+
+        .btn-destructive {
+            background-color: var(--destructive);
+            color: white;
+        }
+
+        .btn-destructive:hover {
+            opacity: 0.9;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--foreground);
+            border: 1px solid var(--border);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--background);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Card */
+        .card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .card-description {
+            font-size: 14px;
+            color: var(--muted-foreground);
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 48px 0;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--muted-foreground);
+        }
+
+        .text-primary { color: var(--primary); }
+        .text-secondary { color: var(--secondary); }
+        .text-accent { color: var(--accent); }
+        .text-destructive { color: var(--destructive); }
+        .text-success { color: var(--success); }
+
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(61, 90, 128, 0.1);
+        }
+
+        .form-helper {
+            font-size: 12px;
+            color: var(--muted-foreground);
+            margin-top: 4px;
+        }
+
+        .form-section {
+            margin-bottom: 32px;
+        }
+
+        .form-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .alert-error {
+            background-color: rgba(220, 38, 38, 0.1);
+            border: 1px solid var(--destructive);
+            color: var(--destructive);
+        }
+
+        .alert-success {
+            background-color: rgba(22, 163, 74, 0.1);
+            border: 1px solid var(--success);
+            color: var(--success);
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: var(--card);
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        /* Table */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .table thead tr {
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table thead th {
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--muted-foreground);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .table thead th:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .table tbody td {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-pending {
+            background-color: #fef08a;
+            color: #854d0e;
+        }
+
+        .badge-approved {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rejected {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .pagination button {
+            min-width: 36px;
+            height: 36px;
+            border: 1px solid var(--border);
+            background-color: var(--card);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .pagination button.active {
+            background-color: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .pagination button:hover:not(.active) {
+            background-color: var(--background);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Navigation */
+        nav {
+            margin-bottom: 32px;
+        }
+
+        nav button {
+            margin-right: 8px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+
+            .header-left h1 {
+                font-size: 22px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .table {
+                font-size: 12px;
+            }
+
+            .table thead th,
+            .table tbody td {
+                padding: 8px 12px;
+            }
+
+            .header-right {
+                flex-direction: column;
+                width: 100%;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-size: 18px;
+        }
+
+        /* Spinner */
+        .spinner {
+            border: 3px solid var(--border);
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .text-center { text-align: center; }
+        .mb-4 { margin-bottom: 16px; }
+        .mt-6 { margin-top: 24px; }
+        .p-4 { padding: 16px; }
+        .gap-2 { gap: 8px; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loadingScreen" class="loading" style="display: none;">
+        <div class="spinner"></div>
+        <span>Memuat...</span>
+    </div>
+
+    <!-- Main App Container -->
+    <div id="app">
+        <!-- Header will be inserted here -->
+        <div id="header"></div>
+        <!-- Page content will be inserted here -->
+        <main id="main"></main>
+    </div>
+
+    <!-- Login Modal (for debugging) -->
+    <div id="loginModal" class="modal active">
+        <div class="modal-content">
+            <div class="card-header">
+                <h2 class="card-title">Login</h2>
+                <p class="card-description">Masukkan username dan password</p>
+            </div>
+            <div class="card-content">
+                <div id="loginError" class="alert alert-error" style="display: none;">
+                    <span id="loginErrorMsg"></span>
+                </div>
+
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" id="username" placeholder="Masukkan username">
+                        <p class="form-helper">Admin: admin123 | Mahasiswa: 123</p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" id="password" placeholder="Masukkan password">
+                        <p class="form-helper">Admin: admin123 | Mahasiswa: 123</p>
+                    </div>
+
+                    <button class="btn btn-primary" id="loginBtn" style="width: 100%; justify-content: center;">Login</button>
+                </div>
+
+                <div id="captchaForm" style="display: none;">
+                    <div class="p-4" style="background-color: rgba(74, 157, 159, 0.1); border: 1px solid var(--secondary); border-radius: 6px; margin-bottom: 16px;">
+                        <p class="text-center" style="font-size: 18px; font-weight: 600;" id="captchaQuestion"></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Jawaban</label>
+                        <input type="text" id="captchaAnswer" placeholder="Masukkan jawaban" autofocus>
+                    </div>
+
+                    <button class="btn btn-primary" id="captchaBtn" style="width: 100%; justify-content: center; margin-bottom: 8px;">Verifikasi & Masuk</button>
+                    <button class="btn btn-outline" id="backBtn" style="width: 100%; justify-content: center;">Kembali</button>
+                </div>
+
+                <div class="mt-6 text-center" style="font-size: 12px; color: var(--muted-foreground);">
+                    <p>Demo login untuk testing</p>
+                    <p style="margin-top: 8px;">
+                        <span style="font-weight: 600;">Admin:</span> admin123 / admin123
+                    </p>
+                    <p>
+                        <span style="font-weight: 600;">Mahasiswa:</span> 123 / 123
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Icon SVGs -->
+    <svg id="arrowRightIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="5" y1="12" x2="19" y2="12"></line>
+        <polyline points="12 5 19 12 12 19"></polyline>
+    </svg>
+
+    <svg id="logoutIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+    </svg>
+
+    <svg id="sendIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+    </svg>
+
+    <svg id="downloadIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+        <polyline points="7 10 12 15 17 10"></polyline>
+        <line x1="12" y1="15" x2="12" y2="3"></line>
+    </svg>
+
+    <svg id="eyeIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+        <circle cx="12" cy="12" r="3"></circle>
+    </svg>
+
+    <svg id="settingsIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"></circle>
+        <path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m2.12 2.12l4.24 4.24M1 12h6m6 0h6m-15.78 7.78l4.24-4.24m2.12-2.12l4.24-4.24"></path>
+    </svg>
+
+    <svg id="chartIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="12" y1="2" x2="12" y2="22"></line>
+        <path d="M17 5H9.5a1.5 1.5 0 0 0-1.5 1.5v12a1.5 1.5 0 0 0 1.5 1.5H17"></path>
+        <path d="M7 12h2v8H7z"></path>
+    </svg>
+
+    <svg id="arrowLeftIcon" style="display: none;" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+
+    <script>
+        // ============ DATA & CONSTANTS ============
+        const ROOMS = [
+            { id: "1", name: "AULA ITSB", capacity: 500, location: "Lantai 1" },
+            { id: "2", name: "Ruangan Kelas 201 (Lab Cerdas)", capacity: 40, location: "Lantai 2" },
+            { id: "3", name: "Ruangan Kelas 202", capacity: 40, location: "Lantai 2" },
+            { id: "4", name: "Ruangan Kelas 203", capacity: 40, location: "Lantai 2" },
+            { id: "5", name: "Ruangan Kelas 204", capacity: 40, location: "Lantai 2" },
+            { id: "6", name: "Ruangan Kelas 205", capacity: 40, location: "Lantai 2" },
+            { id: "7", name: "Ruangan Kelas 206", capacity: 40, location: "Lantai 2" },
+            { id: "8", name: "Ruangan Kelas 201 C", capacity: 35, location: "Lantai 2C" },
+            { id: "9", name: "Ruangan Kelas 202 C", capacity: 35, location: "Lantai 2C" },
+            { id: "10", name: "Ruangan Kelas 203 C", capacity: 35, location: "Lantai 2C" },
+            { id: "11", name: "Ruangan Kelas 204 C", capacity: 35, location: "Lantai 2C" },
+            { id: "12", name: "Ruangan Kelas 301", capacity: 40, location: "Lantai 3" },
+            { id: "13", name: "Ruangan Kelas 302", capacity: 40, location: "Lantai 3" },
+            { id: "14", name: "Ruangan Kelas 303", capacity: 40, location: "Lantai 3" },
+            { id: "15", name: "Ruangan Kelas 304", capacity: 40, location: "Lantai 3" },
+            { id: "16", name: "Ruangan Kelas 305", capacity: 40, location: "Lantai 3" },
+            { id: "17", name: "Ruangan Kelas 306", capacity: 40, location: "Lantai 3" },
+            { id: "18", name: "Ruangan Kelas 307", capacity: 40, location: "Lantai 3" },
+            { id: "19", name: "Ruangan Kelas 308", capacity: 40, location: "Lantai 3" },
+            { id: "20", name: "Ruangan Kelas 401", capacity: 40, location: "Lantai 4" },
+            { id: "21", name: "Ruangan Kelas 402", capacity: 40, location: "Lantai 4" },
+            { id: "22", name: "Ruangan Kelas 403", capacity: 40, location: "Lantai 4" },
+            { id: "23", name: "Ruangan Kelas 404", capacity: 40, location: "Lantai 4" },
+            { id: "24", name: "Ruangan Kelas 405", capacity: 40, location: "Lantai 4" },
+            { id: "25", name: "Ruangan Kelas 406", capacity: 40, location: "Lantai 4" },
+        ];
+
+        const CAPTCHA_QUESTIONS = [
+            { question: "2 + 3 = ?", answer: "5" },
+            { question: "5 + 7 = ?", answer: "12" },
+            { question: "10 - 4 = ?", answer: "6" },
+            { question: "3 × 4 = ?", answer: "12" },
+            { question: "15 ÷ 3 = ?", answer: "5" },
+            { question: "8 + 6 = ?", answer: "14" },
+            { question: "20 - 5 = ?", answer: "15" },
+            { question: "6 × 2 = ?", answer: "12" },
+            { question: "9 + 9 = ?", answer: "18" },
+            { question: "25 ÷ 5 = ?", answer: "5" },
+        ];
+
+        // ============ STATE ============
+        let currentUser = null;
+        let currentPage = 'login';
+        let bookings = [];
+        let filterStatus = 'all';
+        let sortField = 'createdAt';
+        let sortOrder = 'desc';
+        let searchTerm = '';
+        let pageNumber = 1;
+        let currentCaptcha = null;
+        let loginStep = 'login';
+
+        // ============ UTILITY FUNCTIONS ============
+        function generateId() {
+            return Math.random().toString(36).substr(2, 9);
+        }
+
+        function generateCaptcha() {
+            return CAPTCHA_QUESTIONS[Math.floor(Math.random() * CAPTCHA_QUESTIONS.length)];
+        }
+
+        function verifyCaptcha(answer, correct) {
+            return answer.trim().toLowerCase() === correct.trim().toLowerCase();
+        }
+
+        function getCurrentDateTime() {
+            return new Date().toISOString();
+        }
+
+        // ============ STORAGE FUNCTIONS ============
+        function saveBooking(booking) {
+            bookings = JSON.parse(localStorage.getItem('room_bookings') || '[]');
+            bookings.push(booking);
+            localStorage.setItem('room_bookings', JSON.stringify(bookings));
+        }
+
+        function loadBookings() {
+            bookings = JSON.parse(localStorage.getItem('room_bookings') || '[]');
+        }
+
+        function updateBooking(id, updates) {
+            bookings = bookings.map(b => b.id === id ? { ...b, ...updates } : b);
+            localStorage.setItem('room_bookings', JSON.stringify(bookings));
+        }
+
+        function saveUser(user) {
+            localStorage.setItem('user', JSON.stringify(user));
+        }
+
+        function loadUser() {
+            const stored = localStorage.getItem('user');
+            return stored ? JSON.parse(stored) : null;
+        }
+
+        // ============ AUTHENTICATION ============
+        function login(username, password) {
+            if ((username === 'admin123' && password === 'admin123') || 
+                (username === '123' && password === '123')) {
+                const user = {
+                    id: generateId(),
+                    username: username,
+                    role: username === 'admin123' ? 'admin' : 'student'
+                };
+                currentUser = user;
+                saveUser(user);
+                return true;
+            }
+            return false;
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('user');
+            loadBookings();
+            showLoginPage();
+        }
+
+        // ============ HEADER RENDERING ============
+        function renderHeader() {
+            const header = document.getElementById('header');
+            if (!currentUser) {
+                header.innerHTML = '';
+                return;
+            }
+
+            const role = currentUser.role === 'admin' ? 'Administrator' : 'Mahasiswa';
+            const actionBtn = currentUser.role === 'admin' 
+                ? `<a href="#" onclick="showAdminPage(); return false;" class="btn btn-primary">Dashboard Admin ➜</a>`
+                : `<a href="#" onclick="showBookPage(); return false;" class="btn btn-primary">Pesan Ruangan ➜</a>`;
+
+            header.innerHTML = `
+                <div class="header">
+                    <div class="container">
+                        <div class="header-content">
+                            <div class="header-left">
+                                <h1>Sistem Peminjaman Ruangan</h1>
+                                <p>INSTITUT TEKNOLOGI SAINS BANDUNG (ITSB)</p>
+                            </div>
+                            <div class="header-right">
+                                <div class="user-info">
+                                    <p>Masuk sebagai</p>
+                                    <p>${role}</p>
+                                </div>
+                                ${actionBtn}
+                                <button class="btn btn-secondary" onclick="logout()">Logout</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ============ PAGE RENDERING ============
+        function showLoginPage() {
+            document.getElementById('loginModal').classList.add('active');
+            document.getElementById('header').innerHTML = '';
+            currentPage = 'login';
+            loginStep = 'login';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('captchaForm').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        }
+
+        function showHomePage() {
+            document.getElementById('loginModal').classList.remove('active');
+            currentPage = 'home';
+            loadBookings();
+
+            const approved = bookings.filter(b => b.status === 'approved').length;
+            const pending = bookings.filter(b => b.status === 'pending').length;
+            const available = 26 - approved;
+
+            renderHeader();
+            const main = document.getElementById('main');
+            main.innerHTML = `
+                <div class="container main-content">
+                    <div class="grid-3">
+                        <div class="stat-card">
+                            <div class="stat-value text-accent">${available}</div>
+                            <div class="stat-label">Total Ruangan Tersedia</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value text-primary">${pending}</div>
+                            <div class="stat-label">Pemesanan Menunggu</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value text-secondary">${approved}</div>
+                            <div class="stat-label">Pemesanan Disetujui</div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Mulai Pesan Ruangan</h2>
+                            <p class="card-description">Pilih ruangan yang Anda butuhkan dan isi formulir pemesanan</p>
+                        </div>
+                        <div class="card-content text-center">
+                            <button onclick="showBookPage()" class="btn btn-primary" style="font-size: 16px; padding: 12px 24px;">
+                                Buat Pemesanan Baru ➜
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showBookPage() {
+            if (currentUser.role !== 'student') {
+                alert('Hanya mahasiswa yang bisa membuat pemesanan');
+                return;
+            }
+
+            document.getElementById('loginModal').classList.remove('active');
+            currentPage = 'book';
+            renderHeader();
+
+            const roomOptions = ROOMS.map(r => `<option value="${r.id}">${r.name} (${r.location}) - Kapasitas: ${r.capacity}</option>`).join('');
+
+            const main = document.getElementById('main');
+            main.innerHTML = `
+                <div class="container main-content">
+                    <button onclick="showHomePage()" class="btn btn-outline mb-4">← Kembali</button>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Formulir Pemesanan Ruangan</h2>
+                            <p class="card-description">Lengkapi semua kolom untuk melanjutkan pemesanan</p>
+                        </div>
+                        <div class="card-content">
+                            <div id="bookSuccess" class="alert alert-success" style="display: none;">
+                                Pemesanan Anda telah diterima! Admin akan meninjau dan menghubungi Anda segera.
+                            </div>
+
+                            <form id="bookForm" onsubmit="handleBookingSubmit(event)">
+                                <div class="form-section">
+                                    <h3>Informasi Pribadi</h3>
+
+                                    <div class="form-group">
+                                        <label>Nama Lengkap *</label>
+                                        <input type="text" name="fullName" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Email *</label>
+                                        <input type="email" name="email" required>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Nomor Telepon *</label>
+                                        <input type="tel" name="phone" required>
+                                    </div>
+                                </div>
+
+                                <div class="form-section">
+                                    <h3>Detail Pemesanan</h3>
+
+                                    <div class="form-group">
+                                        <label>Pilih Ruangan *</label>
+                                        <select name="roomId" id="roomSelect" required onchange="updateRoomInfo()">
+                                            <option value="">-- Pilih Ruangan --</option>
+                                            ${roomOptions}
+                                        </select>
+                                    </div>
+
+                                    <div id="roomInfo" style="display: none; background-color: rgba(74, 157, 159, 0.1); border: 1px solid var(--secondary); border-radius: 6px; padding: 12px; margin-bottom: 16px; font-size: 14px;">
+                                        <p>
+                                            <span style="font-weight: 600;">Ruangan Dipilih:</span>
+                                            <span id="selectedRoomName"></span>
+                                        </p>
+                                        <p style="color: var(--muted-foreground);">
+                                            Lokasi: <span id="selectedRoomLocation"></span> | Kapasitas: <span id="selectedRoomCapacity"></span> orang
+                                        </p>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Tanggal Peminjaman *</label>
+                                        <input type="date" name="date" required>
+                                    </div>
+
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Jam Mulai *</label>
+                                            <input type="time" name="startTime" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Jam Selesai *</label>
+                                            <input type="time" name="endTime" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Keperluan Peminjaman *</label>
+                                        <textarea name="purpose" rows="4" placeholder="Jelaskan tujuan peminjaman ruangan ini..." required></textarea>
+                                    </div>
+                                </div>
+
+                                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">
+                                    Kirim Pemesanan
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateRoomInfo() {
+            const roomId = document.getElementById('roomSelect').value;
+            if (!roomId) {
+                document.getElementById('roomInfo').style.display = 'none';
+                return;
+            }
+
+            const room = ROOMS.find(r => r.id === roomId);
+            if (room) {
+                document.getElementById('selectedRoomName').textContent = room.name;
+                document.getElementById('selectedRoomLocation').textContent = room.location;
+                document.getElementById('selectedRoomCapacity').textContent = room.capacity;
+                document.getElementById('roomInfo').style.display = 'block';
+            }
+        }
+
+        function handleBookingSubmit(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            const booking = {
+                id: generateId(),
+                fullName: formData.get('fullName'),
+                email: formData.get('email'),
+                phone: formData.get('phone'),
+                roomId: formData.get('roomId'),
+                date: formData.get('date'),
+                startTime: formData.get('startTime'),
+                endTime: formData.get('endTime'),
+                purpose: formData.get('purpose'),
+                status: 'pending',
+                createdAt: getCurrentDateTime()
+            };
+
+            saveBooking(booking);
+            document.getElementById('bookSuccess').style.display = 'flex';
+            form.reset();
+            document.getElementById('roomInfo').style.display = 'none';
+
+            setTimeout(() => {
+                document.getElementById('bookSuccess').style.display = 'none';
+            }, 3000);
+        }
+
+        function showAdminPage() {
+            if (currentUser.role !== 'admin') {
+                alert('Hanya admin yang bisa mengakses dashboard');
+                return;
+            }
+
+            document.getElementById('loginModal').classList.remove('active');
+            currentPage = 'admin';
+            loadBookings();
+            renderHeader();
+
+            renderAdminDashboard();
+        }
+
+        function renderAdminDashboard() {
+            const main = document.getElementById('main');
+            
+            const pending = bookings.filter(b => b.status === 'pending').length;
+            const approved = bookings.filter(b => b.status === 'approved').length;
+            const rejected = bookings.filter(b => b.status === 'rejected').length;
+            const available = 26 - approved;
+
+            main.innerHTML = `
+                <div class="container main-content">
+                    <div class="grid-3">
+                        <div class="stat-card">
+                            <div class="stat-value">${bookings.length}</div>
+                            <div class="stat-label">Total Pemesanan</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value text-primary">${pending}</div>
+                            <div class="stat-label">Menunggu Persetujuan</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value text-secondary">${approved}</div>
+                            <div class="stat-label">Disetujui</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value text-destructive">${rejected}</div>
+                            <div class="stat-label">Ditolak</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value text-success">${available}</div>
+                            <div class="stat-label">Ketersediaan Ruangan</div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="margin-bottom: 24px;">
+                        <div class="card-header">
+                            <h3 style="margin-bottom: 16px;">Filter & Cari</h3>
+                            <div class="form-group">
+                                <label>Cari Pemesanan</label>
+                                <input type="text" id="searchInput" placeholder="Cari berdasarkan nama, email, atau ID..." 
+                                       onkeyup="updateAdminTable()">
+                            </div>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                                <button class="btn btn-primary" onclick="setFilter('all'); updateAdminTable();">Semua</button>
+                                <button class="btn btn-outline" onclick="setFilter('pending'); updateAdminTable();">Menunggu</button>
+                                <button class="btn btn-outline" onclick="setFilter('approved'); updateAdminTable();">Disetujui</button>
+                                <button class="btn btn-outline" onclick="setFilter('rejected'); updateAdminTable();">Ditolak</button>
+                                <button class="btn btn-accent" onclick="exportToCSV();">Download CSV</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3>Daftar Pemesanan</h3>
+                        </div>
+                        <div class="card-content" id="bookingTableContainer">
+                            <!-- Table will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            updateAdminTable();
+        }
+
+        function setFilter(status) {
+            filterStatus = status;
+            document.querySelectorAll('.card-header .btn').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-outline');
+            });
+            event.target.classList.remove('btn-outline');
+            event.target.classList.add('btn-primary');
+        }
+
+        function updateAdminTable() {
+            const searchTerm = document.getElementById('searchInput')?.value || '';
+            
+            let filtered = bookings;
+            if (filterStatus !== 'all') {
+                filtered = filtered.filter(b => b.status === filterStatus);
+            }
+            if (searchTerm) {
+                filtered = filtered.filter(b => 
+                    b.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    b.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    b.id.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            // Sort
+            filtered.sort((a, b) => {
+                let aVal = a[sortField];
+                let bVal = b[sortField];
+                if (sortField === 'date' || sortField === 'createdAt') {
+                    aVal = new Date(aVal).getTime();
+                    bVal = new Date(bVal).getTime();
+                }
+                if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            // Pagination
+            const itemsPerPage = 10;
+            const totalPages = Math.ceil(filtered.length / itemsPerPage);
+            const startIndex = (pageNumber - 1) * itemsPerPage;
+            const paginatedBookings = filtered.slice(startIndex, startIndex + itemsPerPage);
+
+            let tableHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th onclick="toggleSort('fullName')">Nama</th>
+                            <th>Ruangan</th>
+                            <th onclick="toggleSort('date')">Tanggal & Jam</th>
+                            <th onclick="toggleSort('status')">Status</th>
+                            <th style="text-align: center;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            paginatedBookings.forEach(booking => {
+                const room = ROOMS.find(r => r.id === booking.roomId);
+                const statusBadge = `
+                    ${booking.status === 'pending' ? '<span class="badge badge-pending">Menunggu</span>' : ''}
+                    ${booking.status === 'approved' ? '<span class="badge badge-approved">Disetujui</span>' : ''}
+                    ${booking.status === 'rejected' ? '<span class="badge badge-rejected">Ditolak</span>' : ''}
+                `;
+
+                tableHTML += `
+                    <tr>
+                        <td>
+                            <div style="font-weight: 500;">${booking.fullName}</div>
+                            <div style="font-size: 12px; color: var(--muted-foreground);">${booking.email}</div>
+                        </td>
+                        <td>
+                            <div>${room?.name || 'N/A'}</div>
+                            <div style="font-size: 12px; color: var(--muted-foreground);">${room?.location || ''}</div>
+                        </td>
+                        <td>
+                            <div>${booking.date}</div>
+                            <div style="font-size: 12px; color: var(--muted-foreground);">${booking.startTime} - ${booking.endTime}</div>
+                        </td>
+                        <td>${statusBadge}</td>
+                        <td style="text-align: center;">
+                            <button onclick="viewBooking('${booking.id}')" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">
+                                Lihat
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            tableHTML += `
+                    </tbody>
+                </table>
+            `;
+
+            if (paginatedBookings.length === 0) {
+                tableHTML = '<div class="text-center" style="padding: 32px; color: var(--muted-foreground);">Tidak ada data pemesanan</div>';
+            }
+
+            // Pagination buttons
+            if (totalPages > 1) {
+                tableHTML += `<div class="pagination">`;
+                for (let i = 1; i <= totalPages; i++) {
+                    tableHTML += `
+                        <button 
+                            onclick="pageNumber = ${i}; updateAdminTable()" 
+                            class="${pageNumber === i ? 'active' : ''}"
+                            style="${pageNumber === i ? 'background-color: var(--primary); color: white;' : ''}"
+                        >
+                            ${i}
+                        </button>
+                    `;
+                }
+                tableHTML += `</div>`;
+            }
+
+            document.getElementById('bookingTableContainer').innerHTML = tableHTML;
+        }
+
+        function toggleSort(field) {
+            if (sortField === field) {
+                sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortField = field;
+                sortOrder = 'asc';
+            }
+            pageNumber = 1;
+            updateAdminTable();
+        }
+
+        function viewBooking(id) {
+            const booking = bookings.find(b => b.id === id);
+            const room = ROOMS.find(r => r.id === booking.roomId);
+
+            const modal = document.createElement('div');
+            modal.className = 'modal active';
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="card-header">
+                        <h2 class="card-title">Detail Pemesanan</h2>
+                    </div>
+                    <div class="card-content">
+                        <div style="margin-bottom: 16px;">
+                            <p style="color: var(--muted-foreground); font-size: 12px;">ID Pemesanan</p>
+                            <p style="font-weight: 600;">${booking.id}</p>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <p style="color: var(--muted-foreground); font-size: 12px;">Data Pribadi</p>
+                            <p><strong>Nama:</strong> ${booking.fullName}</p>
+                            <p><strong>Email:</strong> ${booking.email}</p>
+                            <p><strong>Telepon:</strong> ${booking.phone}</p>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <p style="color: var(--muted-foreground); font-size: 12px;">Detail Pemesanan</p>
+                            <p><strong>Ruangan:</strong> ${room?.name}</p>
+                            <p><strong>Lokasi:</strong> ${room?.location}</p>
+                            <p><strong>Tanggal:</strong> ${booking.date}</p>
+                            <p><strong>Waktu:</strong> ${booking.startTime} - ${booking.endTime}</p>
+                        </div>
+
+                        <div style="margin-bottom: 16px;">
+                            <p style="color: var(--muted-foreground); font-size: 12px;">Keperluan</p>
+                            <p>${booking.purpose}</p>
+                        </div>
+
+                        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+                            ${booking.status === 'pending' ? `
+                                <button onclick="approveBooking('${booking.id}')" class="btn btn-primary" style="flex: 1;">Setujui</button>
+                                <button onclick="rejectBooking('${booking.id}')" class="btn btn-destructive" style="flex: 1;">Tolak</button>
+                            ` : `
+                                <p style="font-weight: 600; color: ${booking.status === 'approved' ? 'var(--secondary)' : 'var(--destructive)'};">
+                                    Status: ${booking.status === 'approved' ? 'Disetujui' : 'Ditolak'}
+                                </p>
+                            `}
+                        </div>
+
+                        <button onclick="this.parentElement.parentElement.style.display = 'none'" class="btn btn-outline" style="width: 100%;">Tutup</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            modal.onclick = (e) => {
+                if (e.target === modal) {
+                    modal.remove();
+                }
+            };
+        }
+
+        function approveBooking(id) {
+            updateBooking(id, { status: 'approved' });
+            updateAdminTable();
+            document.querySelector('.modal').remove();
+            alert('Pemesanan telah disetujui');
+        }
+
+        function rejectBooking(id) {
+            updateBooking(id, { status: 'rejected' });
+            updateAdminTable();
+            document.querySelector('.modal').remove();
+            alert('Pemesanan telah ditolak');
+        }
+
+        function exportToCSV() {
+            let csv = 'ID,Nama,Email,Telepon,Ruangan,Tanggal,Jam Mulai,Jam Selesai,Keperluan,Status\n';
+            
+            bookings.forEach(booking => {
+                const room = ROOMS.find(r => r.id === booking.roomId);
+                csv += `"${booking.id}","${booking.fullName}","${booking.email}","${booking.phone}","${room?.name || ''}","${booking.date}","${booking.startTime}","${booking.endTime}","${booking.purpose}","${booking.status}"\n`;
+            });
+
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv));
+            element.setAttribute('download', `bookings-${new Date().toISOString().split('T')[0]}.csv`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        // ============ LOGIN HANDLERS ============
+        document.addEventListener('DOMContentLoaded', function() {
+            loadBookings();
+            const stored = loadUser();
+            if (stored) {
+                currentUser = stored;
+                showHomePage();
+            } else {
+                showLoginPage();
+            }
+
+            // Login button handlers
+            document.getElementById('loginBtn').addEventListener('click', handleLoginClick);
+            document.getElementById('captchaBtn').addEventListener('click', handleCaptchaClick);
+            document.getElementById('backBtn').addEventListener('click', () => {
+                loginStep = 'login';
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('captchaForm').style.display = 'none';
+                document.getElementById('loginError').style.display = 'none';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            });
+
+            document.getElementById('username').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLoginClick();
+            });
+
+            document.getElementById('password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLoginClick();
+            });
+
+            document.getElementById('captchaAnswer').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleCaptchaClick();
+            });
+        });
+
+        function handleLoginClick() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (!username || !password) {
+                showLoginError('Username dan password harus diisi');
+                return;
+            }
+
+            loginStep = 'captcha';
+            currentCaptcha = generateCaptcha();
+            document.getElementById('captchaQuestion').textContent = currentCaptcha.question;
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('captchaForm').style.display = 'block';
+            document.getElementById('loginError').style.display = 'none';
+            document.getElementById('captchaAnswer').value = '';
+            document.getElementById('captchaAnswer').focus();
+
+            // Store for later use
+            window.tempUsername = username;
+            window.tempPassword = password;
+        }
+
+        function handleCaptchaClick() {
+            const answer = document.getElementById('captchaAnswer').value;
+
+            if (!verifyCaptcha(answer, currentCaptcha.answer)) {
+                showLoginError('Jawaban CAPTCHA salah. Silakan coba lagi.');
+                document.getElementById('captchaAnswer').value = '';
+                return;
+            }
+
+            if (login(window.tempUsername, window.tempPassword)) {
+                showHomePage();
+            } else {
+                showLoginError('Username atau password salah');
+                loginStep = 'login';
+                document.getElementById('loginForm').style.display = 'block';
+                document.getElementById('captchaForm').style.display = 'none';
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+                document.getElementById('captchaAnswer').value = '';
+            }
+        }
+
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('loginError');
+            document.getElementById('loginErrorMsg').textContent = message;
+            errorDiv.style.display = 'flex';
+        }
+    </script>
+</body>
+</html>
